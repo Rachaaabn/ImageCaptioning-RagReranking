@@ -1,0 +1,8 @@
+AUDIT ANTI-FUITE
+================
+
+Images KB : 10000
+Images validation : 100
+Images test : 100
+
+Total captions : 51026
