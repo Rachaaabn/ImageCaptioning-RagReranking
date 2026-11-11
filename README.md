@@ -1,15 +1,15 @@
 # Image Processing Project — RAG for Image Captioning
 
-## Description
+Description
 Comparative study of RAG (Retrieval-Augmented Generation) techniques for image caption generation on a subset of MS COCO.
 
-## Team
+Team
 - **Member 1:** Data Engineer (Preprocessing)
 - **Member 2:** RAG Engineer (FAISS + Cross-Encoder Reranking)
 - **Member 3:** Generation Engineer (BLIP-2)
 - **Member 4:** Evaluation Engineer (Metrics + Statistical Tests)
 
-## Project Structure
+Project Structure
 
 - **data/**: Raw and processed data
 - **notebooks/**: Jupyter notebooks
@@ -22,32 +22,32 @@ Comparative study of RAG (Retrieval-Augmented Generation) techniques for image c
   - **evaluation/**: Metrics and statistical tests
 - **reports/**: Final report (15-20 pages)
 
-## Installation
+Installation
 pip install -r requirements.txt
 
-## Usage
+Usage
 To reproduce the results:
 1. Run src/retrieval/build_faiss.py to build the search engine.
 2. Run notebooks/03_generation.ipynb to generate captions.
 3. Run src/evaluation/ scripts to compute metrics.
 
-## Dataset
+Dataset
 MS COCO 2017:
 - 10,000 KB images (train2017)
 - 100 validation images (train2017, separate from KB)
 - 100 / 1,000 test images (val2017)
 
-## Method
+Method
 1. **Visual analysis:** CLIP image embeddings (512-dim)
 2. **Retrieval:** FAISS Top-20 similar images
 3. **Reranking:** Cross-Encoder to keep Top-5
 4. **Generation:** BLIP-2 caption with retrieved examples
 5. **Evaluation:** CIDEr, BLEU-4, METEOR, SPICE + statistical tests
 
-## Results
+Results
 - Baseline vs RAG comparison on test images.
 - Primary metric: **CIDEr**.
 - Statistical test: Wilcoxon signed-rank (α = 0.05).
 
-## Group
+Group
 **Group 11 — RAG Reranking**
