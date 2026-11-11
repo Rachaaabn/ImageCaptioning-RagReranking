@@ -23,44 +23,32 @@ ImageCaptioning-RagReranking/
 │   └── evaluation/        # Metrics and statistical tests
 └── reports/               # Final report (15-20 pages) 
 ```
-Installation
-bash
+## Installation
 pip install -r requirements.txt
-Usage
+
+## Usage
 To reproduce the results:
-
 Run src/retrieval/build_faiss.py to build the search engine.
-
 Run notebooks/03_generation.ipynb to generate captions.
-
 Run src/evaluation/ scripts to compute metrics.
 
-Dataset
+## Dataset
 MS COCO 2017:
-
 10,000 KB images (train2017)
-
 100 validation images (train2017, separate from KB)
-
 100 / 1,000 test images (val2017)
 
-Method
+## Method
 Visual analysis: CLIP image embeddings (512-dim)
-
 Retrieval: FAISS Top-20 similar images
-
 Reranking: Cross-Encoder to keep Top-5
-
 Generation: BLIP-2 caption with retrieved examples
-
 Evaluation: CIDEr, BLEU-4, METEOR, SPICE + statistical tests
 
-Results
+## Results
 Baseline vs RAG comparison on test images.
-
 Primary metric: CIDEr.
-
 Statistical test: Wilcoxon signed-rank (α = 0.05).
 
-Group
+## Group
 Group 11 — RAG Reranking
