@@ -24,7 +24,9 @@ ImageCaptioning-RagReranking/
 └── reports/               # Final report (15-20 pages) 
 ```
 ## Installation
+```
 pip install -r requirements.txt
+```
 
 ## Usage
 To reproduce the results:
