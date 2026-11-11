@@ -1,42 +1,31 @@
 # Image Processing Project — RAG for Image Captioning
 
-Description
+## Description
 Comparative study of RAG (Retrieval-Augmented Generation) techniques for image caption generation on a subset of MS COCO.
 
-Team
-Member 1: Data Engineer (Preprocessing)
+## Team
+- **Member 1:** Data Engineer (Preprocessing)
+- **Member 2:** RAG Engineer (FAISS + Cross-Encoder Reranking)
+- **Member 3:** Generation Engineer (BLIP-2)
+- **Member 4:** Evaluation Engineer (Metrics + Statistical Tests)
 
-Member 2: RAG Engineer (FAISS + Cross-Encoder Reranking)
-
-Member 3: Generation Engineer (BLIP-2)
-
-Member 4: Evaluation Engineer (Metrics + Statistical Tests)
-
-Project Structure
-data/: Raw and processed data
-
-notebooks/: Jupyter notebooks
-
-outputs/: FAISS index, embeddings, splits
-
-results/: Final figures, tables, CSV
-
-src/: Python source code
-
-retrieval/: FAISS building scripts
-
-reranking/: Cross-Encoder reranker
-
-captioning/: BLIP-2 generation pipeline
-
-evaluation/: Metrics and statistical tests
-
-reports/: Final report (15-20 pages)
-
+## Project Structure
+```text
+ImageCaptioning-RagReranking/
+├── data/                  # Raw and processed data
+├── notebooks/             # Jupyter notebooks
+├── outputs/               # FAISS index, embeddings, splits
+├── results/               # Final figures, tables, CSV
+├── src/                   # Python source code
+│   ├── retrieval/         # FAISS building scripts
+│   ├── reranking/         # Cross-Encoder reranker
+│   ├── captioning/        # BLIP-2 generation pipeline
+│   └── evaluation/        # Metrics and statistical tests
+└── reports/               # Final report (15-20 pages) 
+```
 Installation
-To install the required dependencies, run the following command in your terminal:
+bash
 pip install -r requirements.txt
-
 Usage
 To reproduce the results:
 
@@ -75,4 +64,3 @@ Statistical test: Wilcoxon signed-rank (α = 0.05).
 
 Group
 Group 11 — RAG Reranking
-
