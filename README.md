@@ -22,9 +22,10 @@ ImageCaptioning-RagReranking/
 │   ├── captioning/        # BLIP-2 generation pipeline
 │   └── evaluation/        # Metrics and statistical tests
 └── reports/               # Final report (15-20 pages)
+
 Installation
-bash
 pip install -r requirements.txt
+
 Usage
 To reproduce the results:
 
