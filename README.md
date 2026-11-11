@@ -1,4 +1,4 @@
-# Image Processing Project — RAG for Image Captionin
+# Image Processing Project — RAG for Image CaptioninG
 
 ## Description
 Comparative study of RAG (Retrieval-Augmented Generation) techniques for image caption generation on a subset of MS COCO.
