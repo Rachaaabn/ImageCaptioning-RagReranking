@@ -1,0 +1,17 @@
+AUDIT ANTI-FUITE
+================
+
+Images KB : 10000
+Images validation : 100
+Images test : 100
+
+Chevauchement KB & Validation : 0
+Chevauchement KB & Test : 0
+Chevauchement Validation & Test : 0
+
+Captions dans KB : 49430
+Captions dans test : 500
+Captions identiques : 14
+
+Note : 14 captions génériques se retrouvent dans les deux splits.
+Ceci est dû à la nature générique de certaines descriptions COCO.
