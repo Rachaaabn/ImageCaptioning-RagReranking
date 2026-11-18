@@ -1,68 +1,90 @@
 import json
 import pandas as pd
+import numpy as np
+import os
 from pycocoevalcap.bleu.bleu import Bleu
 from pycocoevalcap.rouge.rouge import Rouge
 from pycocoevalcap.cider.cider import Cider
-from pycocoevalcap.meteor.meteor import Meteor
-from scipy import stats
-import numpy as np
 
-def evaluate_captions(generated_csv, ground_truth_json):
-    print("Loading data...")
-    # Load generated captions (Assuming columns: image_id, generated_caption)
-    df = pd.read_csv(generated_csv)
+def evaluate_single(csv_path, gt_path, caption_col, label):
+    print(f"\n=============================================")
+    print(f"Evaluating: {label} (File: {csv_path}, Column: {caption_col})")
+    print(f"=============================================")
     
-    # Load ground truth
-    with open(ground_truth_json, 'r') as f:
+    df = pd.read_csv(csv_path)
+    with open(gt_path, 'r') as f:
         gt_data = json.load(f)
         
-    # Format for pycocoevalcap: Dictionary {image_id: [captions]}
+    
+    if isinstance(gt_data, dict) and 'annotations' in gt_data:
+        annotations = gt_data['annotations'] # COCO format
+    else:
+        annotations = gt_data 
+
     gts = {}
-    for item in gt_data:
+    for item in annotations:
         img_id = item['image_id']
-        if img_id not in gts:
-            gts[img_id] = []
-        gts[img_id].append(item['caption_original'])
         
-    # Format generated captions
-    res = {}
-    for index, row in df.iterrows():
-        res[int(row['image_id'])] = [row['generated_caption']]
+        caption_text = item.get('caption', item.get('caption_original'))
+        gts.setdefault(img_id, []).append(caption_text)
         
-    # Only evaluate images that are in both
+    res = {int(row['image_id']): [row[caption_col]] for _, row in df.iterrows()}
+    
     common_ids = set(gts.keys()).intersection(set(res.keys()))
     gts = {k: gts[k] for k in common_ids}
     res = {k: res[k] for k in common_ids}
     
     print(f"Evaluating on {len(common_ids)} images...")
 
-    # Initialize metrics
     scorers = [
         (Bleu(4), ["BLEU-1", "BLEU-2", "BLEU-3", "BLEU-4"]),
-        (Meteor(), "METEOR"),
         (Rouge(), "ROUGE-L"),
         (Cider(), "CIDEr")
     ]
 
     final_scores = {}
+    per_image_cider = None
+
     for scorer, method in scorers:
-        print(f"Computing {method}...")
         score, scores = scorer.compute_score(gts, res)
+        if method == "CIDEr":
+            per_image_cider = scores # Save per-image scores for Wilcoxon test
         if isinstance(method, list):
             for sc, m in zip(score, method):
                 final_scores[m] = sc
         else:
             final_scores[method] = score
 
-    # Print results
-    print("\n--- Evaluation Results ---")
     for metric, score in final_scores.items():
         print(f"{metric}: {score:.4f}")
-
-    print("\n--- Statistical Test Preparation ---")
-    print("To run the Wilcoxon test later, you will compare two arrays of per-image scores.")
-    
-    return final_scores
+        
+    return final_scores, per_image_cider
 
 if __name__ == "__main__":
-    print("Evaluation script is ready! Waiting for Membre 3's generated captions in Phase 2.")
+    # File Paths
+    csv_100 = "results/generated_captions/rag_captions_comparison.csv"
+    csv_1000 = "results/generated_captions/rag_captions_comparison_1000.csv"
+    gt_path = "outputs/captions_val2017.json"
+    
+    # 1. Evaluate 100 images
+    scores_b_100, _ = evaluate_single(csv_100, gt_path, "baseline_caption", "BASELINE - 100 Images")
+    scores_r_100, _ = evaluate_single(csv_100, gt_path, "rag_caption", "RAG - 100 Images")
+    
+    # 2. Evaluate 1000 images
+    scores_b_1000, _ = evaluate_single(csv_1000, gt_path, "baseline_caption", "BASELINE - 1,000 Images")
+    scores_r_1000, _ = evaluate_single(csv_1000, gt_path, "rag_caption", "RAG - 1,000 Images")
+    
+    # 3. Save to CSV (This is what was missing!)
+    print("\nSaving metrics to results/tables/metrics.csv...")
+    os.makedirs("results/tables", exist_ok=True)
+    
+    table_data = [
+        {"Method": "Baseline (100)", "CIDEr": scores_b_100['CIDEr'], "BLEU-4": scores_b_100['BLEU-4'], "ROUGE-L": scores_b_100['ROUGE-L']},
+        {"Method": "RAG (100)", "CIDEr": scores_r_100['CIDEr'], "BLEU-4": scores_r_100['BLEU-4'], "ROUGE-L": scores_r_100['ROUGE-L']},
+        {"Method": "Baseline (1000)", "CIDEr": scores_b_1000['CIDEr'], "BLEU-4": scores_b_1000['BLEU-4'], "ROUGE-L": scores_b_1000['ROUGE-L']},
+        {"Method": "RAG (1000)", "CIDEr": scores_r_1000['CIDEr'], "BLEU-4": scores_r_1000['BLEU-4'], "ROUGE-L": scores_r_1000['ROUGE-L']}
+    ]
+    
+    df_metrics = pd.DataFrame(table_data)
+    df_metrics.to_csv("results/tables/metrics.csv", index=False)
+    print("✅ Saved successfully to results/tables/metrics.csv")
