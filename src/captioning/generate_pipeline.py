@@ -44,9 +44,7 @@ class CaptionGenerator:
         self.blip_model.eval()
 
         print("Loading CLIP (for retrieval)...")
-        self.clip_model = CLIPModel.from_pretrained(
-            "openai/clip-vit-base-patch32"
-        )
+        self.clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         self.clip_processor = CLIPProcessor.from_pretrained(
             "openai/clip-vit-base-patch32"
         )
@@ -63,16 +61,14 @@ class CaptionGenerator:
         self.caption_lookup = {}
         for item in captions_data:
             img_id = item["image_id"]
-            self.caption_lookup.setdefault(img_id, []).append(
-                item["caption_original"]
-            )
+            self.caption_lookup.setdefault(img_id, []).append(item["caption_original"])
 
         print("Loading Reranker...")
         self.reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
         print("✅ CaptionGenerator ready!")
 
-    def get_rag_examples(self, image_path, top_k=5):
+    def get_rag_examples(self, image_path, query_text, top_k=5):
         """Retrieve top-k similar captions using FAISS + Cross-Encoder."""
         image = Image.open(image_path).convert("RGB")
         inputs = self.clip_processor(images=image, return_tensors="pt")
@@ -92,8 +88,8 @@ class CaptionGenerator:
             if kb_id in self.caption_lookup:
                 candidates.append(self.caption_lookup[kb_id][0])
 
-        # Stage 2: Cross-Encoder reranking - top 5
-        pairs = [["Describe this image", c] for c in candidates]
+        # Stage 2: Cross-Encoder reranking using the visual query - top 5
+        pairs = [[query_text, c] for c in candidates]
         scores = self.reranker.predict(pairs)
         ranked = sorted(zip(scores, candidates), reverse=True)
         return [text for _, text in ranked[:top_k]]
@@ -109,8 +105,9 @@ class CaptionGenerator:
         return self.blip_processor.batch_decode(ids, skip_special_tokens=True)[0]
 
     def generate_rag(self, image_path):
-        """Generate caption using top-5 retrieved examples."""
-        examples = self.get_rag_examples(image_path, top_k=5)
+        """Generate caption using top-5 retrieved and reranked examples."""
+        query_text = self.generate_baseline(image_path)
+        examples = self.get_rag_examples(image_path, query_text=query_text, top_k=5)
         examples_text = "\n".join(f"- {ex}" for ex in examples)
         prompt = (
             f"Here are some examples of similar images:\n{examples_text}\n\n"
@@ -118,9 +115,9 @@ class CaptionGenerator:
             "using the style of the examples above."
         )
         image = Image.open(image_path).convert("RGB")
-        inputs = self.blip_processor(
-            images=image, text=prompt, return_tensors="pt"
-        ).to(self.blip_model.device)
+        inputs = self.blip_processor(images=image, text=prompt, return_tensors="pt").to(
+            self.blip_model.device
+        )
         with torch.no_grad():
             ids = self.blip_model.generate(**inputs, max_new_tokens=50)
         return self.blip_processor.batch_decode(ids, skip_special_tokens=True)[0]
