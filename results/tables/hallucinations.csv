@@ -2,4 +2,4 @@ Dataset,Method,Total_Analyzed,Object_Hallucinations,Attribute_Hallucinations,Rel
 100_Images,Baseline,20,0,0,0
 100_Images,RAG,20,1,1,1
 1000_Images,Baseline,20,0,0,0
-1000_Images,RAG,20,2,0,4;
+1000_Images,RAG,20,2,0,4
