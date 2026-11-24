@@ -59,4 +59,4 @@ df = pd.DataFrame(results)
 df.to_csv("outputs/retrieval_metrics.csv", index=False)
 print("✅ DONE! Saved to outputs/retrieval_metrics.csv")
 print("\n--- Retrieval Metrics ---")
-print(df.groupby("K")["Hit"].mean()) # This is Recall@k
+print(df.groupby("K")["Hit"].mean()) # This is Recall@k  
